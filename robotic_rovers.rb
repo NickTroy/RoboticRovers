@@ -1,5 +1,3 @@
-require 'pry'
-
 module RoboticRovers
   def handle_rovers
     input_file = File.read('./input.txt').split("\n")
