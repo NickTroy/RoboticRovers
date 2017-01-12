@@ -10,11 +10,14 @@ module RoboticRovers
       break if input_file.empty?
       initial_coordinates = input_file.shift
       commands = input_file.shift
-      final_coordinates.push(move_rover(initial_coordinates, commands))
+      final_coordinates.push(move_rover(initial_coordinates, commands, field))
     end
+
+    output_text = final_coordinates.join("\n")
+    open('./output.txt', 'w') { |f| f << output_text }
   end
 
-  def move_rover(initial_coordinates, commands)
+  def move_rover(initial_coordinates, commands, field)
     return initial_coordinates if commands.length == 0
     next_command = commands.slice!(0)
     x = initial_coordinates.split(' ')[0].to_i
@@ -24,15 +27,15 @@ module RoboticRovers
     when 'M'
       case direction
       when 'N'
-        y = y + 1
+        y += 1
       when 'S'
-        y = y - 1
+        y -= 1
       when 'E'
-        x = x + 1
+        x += 1
       when 'W'
-        x = x - 1
+        x -= 1
       else
-        puts 'incorrect coordinates'
+        raise 'Incorrect coordinates'
       end
     when 'R'
       case direction
@@ -45,7 +48,7 @@ module RoboticRovers
       when 'W'
         direction = 'N'
       else
-        puts 'incorrect coordinates'
+        raise 'Incorrect coordinates'
       end
     when 'L'
       case direction
@@ -58,12 +61,19 @@ module RoboticRovers
       when 'W'
         direction = 'S'
       else
-        puts 'incorrect coordinates'
+        raise 'Incorrect coordinates'
       end
     else
-      puts 'incorrect command'
+      raise 'Incorrect command'
     end
+    check_coordinates(x, y, field)
     next_coordinates = "#{x} #{y} #{direction}"
-    move_rover(next_coordinates, commands)
+    move_rover(next_coordinates, commands, field)
+  end
+
+  def check_coordinates(x, y, field)
+    max_x = field.split(' ').map(&:to_i)[0]
+    max_y = field.split(' ').map(&:to_i)[1]
+    raise 'Dron went out of boundaries of field' if x > max_x || y > max_y || x < 0 || y < 0
   end
 end
